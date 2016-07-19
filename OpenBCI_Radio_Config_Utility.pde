@@ -3,7 +3,7 @@
 // =
 // = AUTHORS: Colin Fausnaught (cjf1613@rit.edu)
 // =
-// = LAST REVISED: 7/18/16
+// = LAST REVISED: 7/19/16
 // =======================================================================
 import controlP5.*;
 import processing.serial.*;
