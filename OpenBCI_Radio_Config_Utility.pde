@@ -161,21 +161,6 @@ void print_onscreen(String localstring){
   last_message = localstring;
 }
 
-/**** Helper function to read from the serial easily ****/
-void print_bytes(){
-  byte input = byte(board.read());
-  StringBuilder sb = new StringBuilder();
-    
-  while(input != -1){
-    print(char(input));
-    if(char(input) != '$') sb.append(char(input));
-    input = byte(board.read());
-  }
-  print_onscreen(sb.toString());
-  
-  print("\n");
-}
-
 //============== GET CHANNEL ===============
 //= Gets channel information from the radio.
 //=
@@ -426,8 +411,7 @@ void autoconnect(){
           board.write(0xF0);
           board.write(0x07);
           delay(100);
-          print_bytes();
-          return;
+          if(confirm_openbci()) {print_onscreen("Board connected on port " +serialPorts[i] + " with BAUD 115200");return;}
         }
         catch (Exception e){
           println("Board not on port " + serialPorts[i] +" with BAUD 115200");
@@ -441,8 +425,7 @@ void autoconnect(){
           board.write(0xF0);
           board.write(0x07);
           delay(100);
-          print_bytes();
-          return;
+          if(confirm_openbci()) {print_onscreen("Board connected on port " +serialPorts[i] + " with BAUD 230400");return;}
           
         }
         catch (Exception e){
@@ -451,6 +434,36 @@ void autoconnect(){
     }
 }
 
+/**** Helper function to confirm connected serial is an OpenBCI board ****/
+boolean confirm_openbci(){
+  byte input = byte(board.read());
+  if(char(input) == 'F' || char(input) == 'S'){trash_bytes(); return true;}
+  else return false;
+}
+
+/**** Helper function to read from the serial easily ****/
+void print_bytes(){
+  byte input = byte(board.read());
+  StringBuilder sb = new StringBuilder();
+    
+  while(input != -1){
+    print(char(input));
+    if(char(input) != '$') sb.append(char(input));
+    input = byte(board.read());
+  }
+  print_onscreen(sb.toString());
+  
+  print("\n");
+}
+
+/**** Helper function to throw away all bytes coming in from board ****/
+void trash_bytes(){
+  byte input = byte(board.read());
+  
+  while(input != -1){
+    input = byte(board.read());
+  }
+}
 
 //Scans through channels until a success message has been found
 void scan_channels(){
@@ -517,7 +530,7 @@ void refresh(){
     serialPorts = new String[Serial.list().length];
     serialPorts = Serial.list();
 
-    serlist = cp5.addDropdownList("Serial List").setPosition(30, 275);
+    serlist = cp5.addDropdownList("Serial List").setPosition(30, 275).setSize(200,100);
   
     for(int i = 0; i < serialPorts.length; i++){ serlist.addItem(serialPorts[i],i); }
     serlist.close();
