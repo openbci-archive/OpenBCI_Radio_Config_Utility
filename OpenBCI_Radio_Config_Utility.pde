@@ -113,7 +113,7 @@ void draw() {
 }
 
 
-//**** Helper function to draw connection status ****
+//**** Helper function to draw connection status ****/
 public void draw_messages(int messageNum){
 
   if(messageNum == 1){
@@ -140,7 +140,7 @@ public void draw_messages(int messageNum){
   }
 }
 
-//**** Helper function for connection status ****
+//**** Helper function for connection status ****/
 public void drawConnected(boolean isConnected){
   
   if(isConnected){ 
@@ -205,13 +205,19 @@ void mousePressed()
     else if (set_baud_high.MouseIsOver()) set_baud_high();
     else if (check_sys_up.MouseIsOver()) system_status();
     else if(autoconnect.MouseIsOver()) autoconnect();
-    else if(close_port.MouseIsOver()) autoconnect();
     else if(refresh.MouseIsOver()) refresh();
     else if(scan_channels.MouseIsOver()) scan_channels();
+    else if(close_port.MouseIsOver()){ 
+      board.stop();
+      board = null;
+      print_onscreen("Serial port closed");
+    }
   }
   
   else if(refresh.MouseIsOver()) refresh();
   else if(autoconnect.MouseIsOver()) autoconnect();
+  else if(close_port.MouseIsOver()) print_onscreen("No serial instance to close!");
+  
 }
 
 
@@ -505,11 +511,13 @@ boolean confirm_openbci(){
   if(char(input) == 'F' || char(input) == 'S'){trash_bytes(); return true;}
   else return false;
 }
+
+//**** Helper function to check if board is currently connected ****/
 boolean confirm_openbci_draw(){
   if(board != null){
     board.write(0xF0);
     board.write(0x07);
-    delay(500);
+    delay(100);
     byte input = byte(board.read());
     if(char(input) == 'S'){trash_bytes(); return true;}
     else if(char(input) == 'F'){trash_bytes(); return false;}
