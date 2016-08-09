@@ -25,6 +25,10 @@ Button check_sys_up;
 Button refresh;
 Button autoconnect;
 Button scan_channels;
+Button close_port;
+
+Button help_button_autoconnect;
+Button help_button_autoscan;
 
 //Serial Connection
 Serial board;
@@ -72,8 +76,11 @@ void setup() {
   set_baud_high = new Button("Set BAUD to High", 300, 180, 120, 50);
   check_sys_up = new Button("System Status", 20, 180, 120, 50);
   refresh = new Button("Refresh", 50,240,60,25);
-  autoconnect = new Button("Autoconnect", 300, 260, 120, 50);
+  autoconnect = new Button("Autoconnect", 300, 260, 120, 25);
+  close_port = new Button("Close Serial", 300, 290, 120, 25);
   scan_channels = new Button("Autoscan",50,370,60,25);
+  help_button_autoconnect = new Button("?",280,264,15,15);
+  help_button_autoscan = new Button("?",30, 375,15,15);
   
   
 }
@@ -90,29 +97,65 @@ void draw() {
   set_baud_high.Draw();
   check_sys_up.Draw();
   refresh.Draw();
-  autoconnect.Draw();
   scan_channels.Draw();
+  
+  autoconnect.Draw();
+  close_port.Draw();
+  help_button_autoconnect.Draw();
+  help_button_autoscan.Draw();
   image(smallLogo,182,95,75,75);
-  if(confirm_openbci_draw()){
-    drawConnected(true);
-  }
-  else{
-    drawConnected(false);
-  }
+  if(confirm_openbci_draw()) drawConnected(true);
+  else drawConnected(false);
+  
+  if(help_button_autoconnect.MouseIsOver()) draw_messages(1);
+  else if(help_button_autoscan.MouseIsOver()) draw_messages(2);
+
 }
 
 
+//**** Helper function to draw connection status ****
+public void draw_messages(int messageNum){
+
+  if(messageNum == 1){
+    //writes autoconnect help message
+    fill(190,190,190);
+    rect(300,260,120,90);
+    fill(0,0,0);
+    textSize(10);
+    textAlign(LEFT, CENTER);
+    text("Autoconnect will scan through ports and automatically connect you to your OpenBCI board.",305,255,110,100);
+    textSize(12);
+    
+  }
+  else if(messageNum == 2){
+    //writes autscan help message    
+    fill(190,190,190);
+    rect(50,300,120,90);
+    fill(0,0,0);
+    textSize(10);
+    textAlign(LEFT, CENTER);
+    text("Autoscan will scan through channels and automatically set your channel to a nearby board's channel.",55,295,110,100);
+    textSize(12);
+
+  }
+}
+
+//**** Helper function for connection status ****
 public void drawConnected(boolean isConnected){
   
-  if(isConnected) fill(0,255,0);
-  else fill(255,0,0);
+  if(isConnected){ 
+    fill(0,255,0);  
+    ellipse(250,300,10,10); 
+    fill(0,0,0); 
+    text("Connected",250,310);
+  }
+  else {
+    fill(255,0,0);
+    ellipse(250,300,10,10); 
+    fill(0,0,0); 
+    text("Not Connected",250,310);
+  }
   
-  ellipse(250,290,10,10);
-  
-  
-  fill(0,0,0);
-  if(isConnected) text("Connected",250,300);
-  else text("Not Connected",250,300);
 }
 
 
@@ -162,6 +205,7 @@ void mousePressed()
     else if (set_baud_high.MouseIsOver()) set_baud_high();
     else if (check_sys_up.MouseIsOver()) system_status();
     else if(autoconnect.MouseIsOver()) autoconnect();
+    else if(close_port.MouseIsOver()) autoconnect();
     else if(refresh.MouseIsOver()) refresh();
     else if(scan_channels.MouseIsOver()) scan_channels();
   }
@@ -592,7 +636,7 @@ class Button {
     rect(x, y, w, h, 10);
     textAlign(CENTER, CENTER);
     fill(0);
-    text(label, x + (w / 2), y + (h / 2));
+    text(label,x + (w / 2), y + (h / 2));
   }
   
   boolean MouseIsOver() {
