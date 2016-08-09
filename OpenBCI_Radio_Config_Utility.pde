@@ -3,7 +3,7 @@
 // =
 // = AUTHORS: Colin Fausnaught (cjf1613@rit.edu)
 // =
-// = LAST REVISED: 7/19/16
+// = LAST REVISED: 8/9/16
 // =======================================================================
 import controlP5.*;
 import processing.serial.*;
@@ -93,7 +93,28 @@ void draw() {
   autoconnect.Draw();
   scan_channels.Draw();
   image(smallLogo,182,95,75,75);
+  if(confirm_openbci_draw()){
+    drawConnected(true);
+  }
+  else{
+    drawConnected(false);
+  }
 }
+
+
+public void drawConnected(boolean isConnected){
+  
+  if(isConnected) fill(0,255,0);
+  else fill(255,0,0);
+  
+  ellipse(250,290,10,10);
+  
+  
+  fill(0,0,0);
+  if(isConnected) text("Connected",250,300);
+  else text("Not Connected",250,300);
+}
+
 
 /**** Action Listener for dropdown menus ****/
 public void controlEvent(ControlEvent theEvent) {
@@ -438,6 +459,18 @@ void autoconnect(){
 boolean confirm_openbci(){
   byte input = byte(board.read());
   if(char(input) == 'F' || char(input) == 'S'){trash_bytes(); return true;}
+  else return false;
+}
+boolean confirm_openbci_draw(){
+  if(board != null){
+    board.write(0xF0);
+    board.write(0x07);
+    delay(500);
+    byte input = byte(board.read());
+    if(char(input) == 'S'){trash_bytes(); return true;}
+    else if(char(input) == 'F'){trash_bytes(); return false;}
+    else return false;
+  }
   else return false;
 }
 
